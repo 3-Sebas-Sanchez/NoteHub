@@ -1,0 +1,25 @@
+package BreezeTask;
+
+import BreezeTask.Reminder;
+import java.util.Date;
+import java.util.ArrayList;
+
+public class Calendar {
+    private Date date;
+    private Date hour;
+    private ArrayList<Reminder> reminders;
+
+    public Calendar(Date date, Date hour, ArrayList<Reminder>reminders) {
+        this.date = date;
+        this.hour = hour;
+        this.reminders = new ArrayList<>(reminders);
+    }
+
+    public void addTask(Reminder reminder) {
+        reminders.add(reminder);
+    }
+
+    public ArrayList<Reminder> createAnotation (){
+        return reminders;
+    }
+}
