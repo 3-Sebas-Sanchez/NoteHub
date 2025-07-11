@@ -1,0 +1,11 @@
+package BreezeTask;
+
+import java.util.Date;
+
+ interface Content {
+    public abstract String getContent();
+
+    public abstract Boolean isEmpty();
+
+    public abstract Date getDate();
+}
