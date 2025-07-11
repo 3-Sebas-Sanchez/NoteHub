@@ -1,0 +1,27 @@
+package BreezeTask;
+
+import java.util.Date;
+
+public class Note implements BreezeTask.Content {
+    private String text;
+    private Date date;
+    private int number;
+
+    public Note(String text, Date date, int number) {
+        this.text = text;
+        this.date = date;
+        this.number = number;
+    }
+
+    public String getContent() {
+        return text;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public Boolean isEmpty() {
+        return text.equals("");
+    }
+}
