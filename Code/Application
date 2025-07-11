@@ -1,1 +1,205 @@
+package BreezeTask;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.nio.file.*;
+import java.util.Vector;
+
+public class Application {
+
+    private static List<String> notes = new ArrayList<>();
+    private static final String notesFile = "notes.txt";
+    private static final String remindersFile = "reminders.txt";
+    private static List<String> reminders = new ArrayList<>();
+    private static JList<String> notesList;
+    private static JList<String> remindersList;
+
+    //Saves the current list of notes to a file (notes.txt)
+    private static void saveNotes() {
+        try {
+            Files.write(Paths.get(notesFile), notes);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "You do not have any note yet: ");
+        }
+    }
+
+    //Loads notes from the file (notes.txt), if it exists
+    private static void loadNotes() {
+        try {
+            if (Files.exists(Paths.get(notesFile))) {
+                notes = Files.readAllLines(Paths.get(notesFile));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "You do not have any note yet: ");
+        }
+    }
+
+    //Saves the current list of reminders to a file (reminders.txt)
+    private static void saveReminders() {
+        try {
+            Files.write(Paths.get(remindersFile), reminders);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "You do not have any reminder yet: ");
+        }
+    }
+
+    //Loads reminders from the file (reminders.txt), if it exists
+    private static void loadReminders() {
+        try {
+            if (Files.exists(Paths.get(remindersFile))) {
+                reminders = Files.readAllLines(Paths.get(remindersFile));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "You do not have any reminder yet: ");
+        }
+    }
+
+    //Deletes a note at the specified index and updates the file
+    private static void deleteNote(int index) {
+        if (index >= 0 && index < notes.size()) {
+            notes.remove(index);
+            saveNotes();
+        }
+    }
+
+    //Deletes a reminder at the specified index and updates the file
+    private static void deleteReminder(int index) {
+        if (index >= 0 && index < reminders.size()) {
+            reminders.remove(index);
+            saveReminders();
+        }
+    }
+
+    public static void main(String[] args) {
+        loadNotes();
+        loadReminders();
+
+        JFrame frame = new JFrame("NoteHub");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+        frame.setLayout(new BorderLayout());
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        JPanel notesPanel = new JPanel(new BorderLayout());
+
+        JTextArea noteTextArea = new JTextArea();
+        noteTextArea.setFont(new Font("Times new roman", Font.PLAIN, 16));
+        JScrollPane noteScrollPane = new JScrollPane(noteTextArea);
+        notesList = new JList<>(new DefaultListModel<>());
+        JScrollPane listNoteScrollPane = new JScrollPane(notesList);
+        notesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JButton addNoteBtn = new JButton("Add Note");
+        addNoteBtn.addActionListener(e -> {
+            String note = noteTextArea.getText();
+            if (!note.isEmpty()) {
+                try {
+                    notes.add(note);
+                    saveNotes();
+                    noteTextArea.setText("");
+                    JOptionPane.showMessageDialog(frame, "Note added succesfully");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid note");
+                }
+            }
+        });
+
+        JButton showNoteBtn = new JButton("Show Note");
+        showNoteBtn.addActionListener(e -> {
+            DefaultListModel<String> model = (DefaultListModel<String>) notesList.getModel();
+            model.clear();
+            for (String note : notes) {
+                model.addElement(note.substring(0, Math.min(30, note.length())));
+            }
+        });
+
+        JButton deleteNoteBtn = new JButton("Delete note");
+        deleteNoteBtn.addActionListener(e -> {
+            int selectedIndex = notesList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                deleteNote(selectedIndex);
+                notesList.setListData(new Vector<>(notes));
+            }
+        });
+
+        /*
+         * Add a scroll to the notes panel
+         * Add the button to create notes into the notes panel
+         * Add the button to show the notes that had already created
+         */
+        notesPanel.add(noteScrollPane, BorderLayout.CENTER);
+        JPanel noteButtonsPanel = new JPanel(new FlowLayout());
+        noteButtonsPanel.add(showNoteBtn);
+        noteButtonsPanel.add(addNoteBtn);
+        noteButtonsPanel.add(deleteNoteBtn);
+        notesPanel.add(noteButtonsPanel, BorderLayout.SOUTH);
+        notesPanel.add(listNoteScrollPane, BorderLayout.EAST);
+
+        JPanel remindersPanel = new JPanel(new BorderLayout());
+
+        JTextArea reminderTextArea = new JTextArea();
+        reminderTextArea.setFont(new Font("Times new roman", Font.PLAIN, 16));
+        JScrollPane reminderScrollPane = new JScrollPane(reminderTextArea);
+        remindersList = new JList<>(new DefaultListModel<>());
+        JScrollPane listReminderScrollPane = new JScrollPane(remindersList);
+
+        JButton addReminderBtn = new JButton("Add Reminder");
+        addReminderBtn.addActionListener(e -> {
+            String reminder = reminderTextArea.getText();
+            if (!reminder.isEmpty()) {
+                try {
+                    reminders.add(reminder);
+                    saveReminders();
+                    reminderTextArea.setText("To due: ");
+                    JOptionPane.showMessageDialog(frame, "Reminder added succesfully");
+                } catch (Exception a) {
+                    JOptionPane.showMessageDialog(frame, "Invalid reminder");
+                }
+            }
+        });
+
+        JButton showReminderBtn = new JButton("Show Reminder");
+        showReminderBtn.addActionListener(e -> {
+            DefaultListModel<String> model = (DefaultListModel<String>) remindersList.getModel();
+            model.clear();
+            for (String reminder : reminders) {
+                model.addElement(reminder.substring(0, Math.min(30, reminder.length())));
+            }
+        });
+
+        JButton deleteReminderBtn = new JButton("Delete reminder");
+        deleteReminderBtn.addActionListener(e -> {
+            int selectedIndex = remindersList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                deleteReminder(selectedIndex);
+                remindersList.setListData(new Vector<>(reminders));
+            }
+        });
+
+        remindersPanel.add(reminderScrollPane, BorderLayout.CENTER);
+        JPanel reminderButtonsPanel = new JPanel(new FlowLayout());
+        reminderButtonsPanel.add(showReminderBtn);
+        reminderButtonsPanel.add(addReminderBtn);
+        reminderButtonsPanel.add(deleteReminderBtn);
+        remindersPanel.add(reminderButtonsPanel, BorderLayout.SOUTH);
+        remindersPanel.add(listReminderScrollPane, BorderLayout.EAST);
+
+        tabbedPane.addTab("Notes", notesPanel);
+        tabbedPane.addTab("Reminders", remindersPanel);
+
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                saveNotes();
+                saveReminders();
+            }
+        });
+
+        frame.add(tabbedPane, BorderLayout.CENTER);
+        frame.setVisible(true);
+    }
+}
