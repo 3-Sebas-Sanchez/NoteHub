@@ -1,0 +1,29 @@
+package BreezeTask;
+
+import BreezeTask.Content;
+
+import java.util.Date;
+
+public class Reminder implements Content{
+    private Date date;
+    private String text;
+    private int number;
+
+    public Reminder(Date date, String text, int number) {
+        this.date = date;
+        this.text = text;
+        this.number = number;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public Boolean isEmpty() {
+        return text.equals("");
+    }
+
+    public String getContent() {
+        return text;
+    }
+}
